@@ -1,0 +1,696 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>EvacuAID</title>
+<link href="https://fonts.googleapis.com/css2?family=Lora:wght@400;600;700&family=DM+Sans:wght@400;500;700&display=swap" rel="stylesheet">
+<style>
+  :root {
+    --navy: #0D2137;
+    --navy-light: #1A3A5C;
+    --red: #C0392B;
+    --sky: #2E86AB;
+    --cream: #F5F0E8;
+    --cream-dark: #EDE8DF;
+    --gold: #E8A838;
+    --white: #FEFEFE;
+    --text-dark: #1A1A2E;
+    --text-mid: #4A5568;
+  }
+
+  * { box-sizing: border-box; margin: 0; padding: 0; }
+
+  body {
+    font-family: 'DM Sans', sans-serif;
+    background: linear-gradient(135deg, #0D2137 0%, #1A3A5C 50%, #0D2137 100%);
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    min-height: 100vh;
+    padding: 20px;
+  }
+
+  .phone {
+    width: 375px;
+    height: 720px;
+    background: var(--cream);
+    border-radius: 40px;
+    overflow: hidden;
+    display: flex;
+    flex-direction: column;
+    box-shadow: 0 30px 80px rgba(0,0,0,0.6), inset 0 1px 0 rgba(255,255,255,0.2);
+    border: 1px solid rgba(255,255,255,0.1);
+  }
+
+  header {
+    background: linear-gradient(135deg, var(--navy) 0%, var(--navy-light) 100%);
+    padding: 20px;
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    flex-shrink: 0;
+  }
+
+  .header-title {
+    color: white;
+    font-family: 'Lora', serif;
+    font-size: 22px;
+    font-weight: 700;
+    letter-spacing: 1px;
+  }
+
+  .header-right { text-align: right; }
+  .live-dot { color: var(--gold); font-size: 11px; font-weight: 700; }
+  .zip-label { color: rgba(255,255,255,0.5); font-size: 10px; margin-top: 2px; }
+
+  .alert-banner {
+    background: linear-gradient(90deg, var(--red), #E74C3C);
+    color: white;
+    text-align: center;
+    padding: 8px 16px;
+    font-size: 12px;
+    font-weight: 700;
+    letter-spacing: 0.5px;
+    flex-shrink: 0;
+  }
+
+  .content {
+    flex: 1;
+    overflow-y: auto;
+    padding: 20px;
+    background: var(--cream);
+  }
+
+  .page-title {
+    font-family: 'Lora', serif;
+    font-size: 24px;
+    font-weight: 700;
+    color: var(--navy);
+    margin-bottom: 4px;
+  }
+
+  .page-sub {
+    font-size: 13px;
+    color: var(--text-mid);
+    font-style: italic;
+    margin-bottom: 20px;
+  }
+
+  .card {
+    background: var(--white);
+    border-radius: 16px;
+    padding: 18px;
+    margin-bottom: 14px;
+    box-shadow: 0 4px 16px rgba(13,33,55,0.08);
+    border: 1px solid rgba(13,33,55,0.06);
+  }
+
+  label {
+    display: block;
+    font-size: 11px;
+    font-weight: 700;
+    letter-spacing: 1.5px;
+    text-transform: uppercase;
+    color: var(--sky);
+    margin-top: 14px;
+    margin-bottom: 6px;
+  }
+
+  input {
+    width: 100%;
+    padding: 11px 14px;
+    border-radius: 10px;
+    border: 1.5px solid var(--cream-dark);
+    font-family: 'DM Sans', sans-serif;
+    font-size: 14px;
+    color: var(--text-dark);
+    background: var(--cream);
+    outline: none;
+    transition: border-color 0.2s;
+  }
+
+  input:focus { border-color: var(--sky); }
+
+  .btn-primary {
+    width: 100%;
+    padding: 15px;
+    margin-top: 16px;
+    border: none;
+    border-radius: 14px;
+    background: linear-gradient(135deg, var(--navy), var(--navy-light));
+    color: white;
+    font-size: 15px;
+    font-weight: 700;
+    letter-spacing: 0.5px;
+    cursor: pointer;
+    font-family: 'DM Sans', sans-serif;
+    box-shadow: 0 6px 20px rgba(13,33,55,0.3);
+    transition: transform 0.1s, box-shadow 0.1s;
+  }
+
+  .btn-primary:active { transform: scale(0.98); }
+
+  .btn-menu {
+    width: 100%;
+    padding: 14px;
+    margin-bottom: 10px;
+    border: 1.5px solid rgba(13,33,55,0.08);
+    border-radius: 12px;
+    background: var(--white);
+    color: var(--navy);
+    font-size: 14px;
+    font-weight: 600;
+    cursor: pointer;
+    font-family: 'DM Sans', sans-serif;
+    box-shadow: 0 3px 12px rgba(13,33,55,0.1);
+    display: flex;
+    align-items: center;
+    gap: 12px;
+    text-align: left;
+    transition: transform 0.1s;
+  }
+
+  .btn-menu:active { transform: scale(0.98); }
+  .btn-menu .chevron { margin-left: auto; color: var(--text-mid); }
+
+  .btn-icon {
+    width: 36px;
+    height: 36px;
+    border-radius: 10px;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    font-size: 18px;
+    flex-shrink: 0;
+  }
+
+  .btn-back {
+    background: none;
+    border: none;
+    color: var(--sky);
+    font-size: 14px;
+    font-weight: 600;
+    cursor: pointer;
+    font-family: 'DM Sans', sans-serif;
+    padding: 0;
+    margin-bottom: 16px;
+  }
+
+  .stat-row { display: flex; gap: 10px; margin-bottom: 14px; }
+
+  .stat-box {
+    flex: 1;
+    background: var(--white);
+    border-radius: 12px;
+    padding: 14px 10px;
+    text-align: center;
+    box-shadow: 0 3px 10px rgba(13,33,55,0.07);
+  }
+
+  .stat-num {
+    font-family: 'Lora', serif;
+    font-size: 22px;
+    font-weight: 700;
+    color: var(--navy);
+  }
+
+  .stat-label { font-size: 10px; color: var(--text-mid); letter-spacing: 0.5px; margin-top: 2px; }
+
+  .alert-card {
+    border-radius: 14px;
+    padding: 16px;
+    margin-bottom: 12px;
+    border: 1.5px solid;
+  }
+
+  .tag {
+    display: inline-block;
+    padding: 3px 10px;
+    border-radius: 20px;
+    font-size: 10px;
+    font-weight: 700;
+    letter-spacing: 1px;
+    text-transform: uppercase;
+    margin-bottom: 8px;
+    color: white;
+  }
+
+  .divider {
+    height: 1px;
+    background: linear-gradient(90deg, transparent, var(--cream-dark), transparent);
+    margin: 14px 0;
+  }
+
+  .check-item {
+    display: flex;
+    align-items: center;
+    gap: 10px;
+    padding: 9px 0;
+    border-bottom: 1px solid var(--cream-dark);
+    font-size: 13px;
+    color: var(--text-dark);
+    cursor: pointer;
+  }
+
+  .check-item:last-child { border-bottom: none; }
+  .check-item.done { text-decoration: line-through; color: var(--text-mid); }
+
+  .score-card {
+    background: var(--navy);
+    border-radius: 16px;
+    padding: 18px;
+    margin-bottom: 14px;
+    text-align: center;
+  }
+
+  .score-num { color: var(--gold); font-size: 20px; font-weight: 700; font-family: 'Lora', serif; }
+  .score-label { color: rgba(255,255,255,0.6); font-size: 12px; margin-top: 4px; }
+
+  .quiz-option {
+    width: 100%;
+    padding: 14px 16px;
+    margin-bottom: 10px;
+    border: 1.5px solid var(--cream-dark);
+    border-radius: 12px;
+    background: var(--white);
+    color: var(--text-dark);
+    font-size: 14px;
+    cursor: pointer;
+    font-family: 'DM Sans', sans-serif;
+    text-align: left;
+    transition: all 0.15s;
+  }
+
+  .quiz-option:hover { border-color: var(--sky); background: #EFF7FD; }
+  .quiz-option.correct { border-color: #27AE60; background: #E8F8F0; color: #27AE60; font-weight: 700; }
+  .quiz-option.wrong { border-color: var(--red); background: #FEF0EF; color: var(--red); font-weight: 700; }
+
+  .feedback-card {
+    border-radius: 14px;
+    padding: 16px;
+    margin-bottom: 12px;
+    text-align: center;
+    border: 2px solid;
+  }
+
+  .navbar {
+    background: linear-gradient(135deg, var(--navy), var(--navy-light));
+    display: flex;
+    flex-shrink: 0;
+    border-top: 1px solid rgba(255,255,255,0.08);
+  }
+
+  .nav-btn {
+    flex: 1;
+    background: none;
+    border: none;
+    color: rgba(255,255,255,0.45);
+    padding: 12px 6px;
+    font-size: 10px;
+    font-family: 'DM Sans', sans-serif;
+    cursor: pointer;
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    gap: 4px;
+    letter-spacing: 0.5px;
+    transition: color 0.2s;
+  }
+
+  .nav-btn.active { color: var(--gold); }
+  .nav-icon { font-size: 20px; }
+
+  .shelter-row {
+    display: flex;
+    justify-content: space-between;
+    font-size: 12px;
+    color: var(--text-mid);
+  }
+
+  .pill {
+    display: inline-block;
+    padding: 4px 10px;
+    border-radius: 20px;
+    font-size: 11px;
+    font-weight: 700;
+    margin-right: 6px;
+    margin-bottom: 6px;
+  }
+
+  .hidden { display: none; }
+</style>
+</head>
+<body>
+
+<div class="phone">
+  <header>
+    <div>
+      <div class="header-title">🛡 EvacuAID</div>
+      <div style="color:rgba(255,255,255,0.45);font-size:10px;letter-spacing:2px;margin-top:2px;">EMERGENCY PREPAREDNESS</div>
+    </div>
+    <div class="header-right">
+      <div class="live-dot">● LIVE</div>
+      <div class="zip-label" id="zip-display">No ZIP set</div>
+    </div>
+  </header>
+
+  <div class="alert-banner">⚠ Active Emergency Alerts In Your Area</div>
+
+  <div class="content" id="content">
+
+    <!-- ONBOARDING -->
+    <div id="screen-onboard">
+      <div class="page-title">Welcome</div>
+      <div class="page-sub">Let's personalize your emergency plan</div>
+      <div class="card">
+        <label>ZIP Code</label>
+        <input id="zip" placeholder="e.g. 75075">
+        <label>Household Size</label>
+        <input id="people" placeholder="e.g. 4 people">
+        <label>Pets?</label>
+        <input id="pets" placeholder="yes / no">
+        <label>Accessibility Needs</label>
+        <input id="access" placeholder="e.g. wheelchair, none">
+        <button class="btn-primary" onclick="startApp()">Start EvacuAID →</button>
+      </div>
+    </div>
+
+    <!-- HOME -->
+    <div id="screen-home" class="hidden">
+      <div class="page-title">Dashboard</div>
+      <div class="page-sub">Your emergency command center</div>
+      <div class="stat-row">
+        <div class="stat-box">
+          <div class="stat-num" id="stat-people">—</div>
+          <div class="stat-label">People</div>
+        </div>
+        <div class="stat-box">
+          <div class="stat-num" id="stat-pets">—</div>
+          <div class="stat-label">Pets</div>
+        </div>
+        <div class="stat-box">
+          <div class="stat-num" id="stat-zip">—</div>
+          <div class="stat-label">ZIP</div>
+        </div>
+      </div>
+      <button class="btn-menu" onclick="showScreen('supplies')">
+        <div class="btn-icon" style="background:#E8F4FD">🎒</div>
+        <div><div style="font-weight:700">Emergency Supplies</div><div style="font-size:11px;color:var(--text-mid);margin-top:2px">Items to prepare</div></div>
+        <span class="chevron">›</span>
+      </button>
+      <button class="btn-menu" onclick="showScreen('shelter')">
+        <div class="btn-icon" style="background:#FEF3E2">🏠</div>
+        <div><div style="font-weight:700">Find Shelter</div><div style="font-size:11px;color:var(--text-mid);margin-top:2px">Nearest locations near you</div></div>
+        <span class="chevron">›</span>
+      </button>
+      <button class="btn-menu" onclick="showScreen('plan')">
+        <div class="btn-icon" style="background:#E8F8F0">📋</div>
+        <div><div style="font-weight:700">Emergency Plan</div><div style="font-size:11px;color:var(--text-mid);margin-top:2px">Your personalized checklist</div></div>
+        <span class="chevron">›</span>
+      </button>
+      <button class="btn-menu" onclick="showScreen('training')">
+        <div class="btn-icon" style="background:#FDE8E8">🎓</div>
+        <div><div style="font-weight:700">Training Quiz</div><div style="font-size:11px;color:var(--text-mid);margin-top:2px">Test your readiness</div></div>
+        <span class="chevron">›</span>
+      </button>
+    </div>
+
+    <!-- ALERTS -->
+    <div id="screen-alerts" class="hidden">
+      <div class="page-title">Active Alerts</div>
+      <div class="page-sub">Real-time emergency notifications</div>
+      <div class="alert-card" style="border-color:#C0392B;background:#FEF0EF">
+        <span class="tag" style="background:#C0392B">Warning</span>
+        <div style="font-weight:700;font-size:15px;color:var(--navy);margin-bottom:6px">🌪 Tornado Warning</div>
+        <div style="font-size:13px;color:var(--text-mid);line-height:1.6">Seek shelter in a basement or interior room immediately. Stay away from windows.</div>
+      </div>
+      <div class="alert-card" style="border-color:#E67E22;background:#FEF9F0">
+        <span class="tag" style="background:#E67E22">Watch</span>
+        <div style="font-weight:700;font-size:15px;color:var(--navy);margin-bottom:6px">🌊 Flood Watch</div>
+        <div style="font-size:13px;color:var(--text-mid);line-height:1.6">Avoid low-elevation roads. Move valuables to higher ground as a precaution.</div>
+      </div>
+      <div class="alert-card" style="border-color:#2E86AB;background:#EFF7FD">
+        <span class="tag" style="background:#2E86AB">Advisory</span>
+        <div style="font-weight:700;font-size:15px;color:var(--navy);margin-bottom:6px">💨 High Wind Advisory</div>
+        <div style="font-size:13px;color:var(--text-mid);line-height:1.6">Gusts up to 55 mph expected through tonight. Secure all outdoor objects.</div>
+      </div>
+    </div>
+
+    <!-- SUPPLIES -->
+    <div id="screen-supplies" class="hidden">
+      <button class="btn-back" onclick="showScreen('home')">← Back</button>
+      <div class="page-title">Emergency Supplies</div>
+      <div class="page-sub">Tap items to check them off</div>
+      <div class="card" id="supplies-list"></div>
+      <div class="score-card">
+        <div class="score-num" id="supply-count">0 / 0</div>
+        <div class="score-label">items packed</div>
+      </div>
+    </div>
+
+    <!-- SHELTER -->
+    <div id="screen-shelter" class="hidden">
+      <button class="btn-back" onclick="showScreen('home')">← Back</button>
+      <div class="page-title">Nearby Shelters</div>
+      <div class="page-sub" id="shelter-sub">Based on your ZIP code</div>
+      <div class="card">
+        <div style="font-weight:700;font-size:14px;color:var(--navy)">Red Cross Emergency Shelter</div>
+        <div style="font-size:12px;color:var(--text-mid);margin-top:4px">1200 Main St</div>
+        <div class="divider"></div>
+        <div class="shelter-row">
+          <span>📍 2.4 mi away</span>
+          <span style="display:inline-block;padding:3px 10px;border-radius:20px;background:#E8F8F0;color:#27AE60;font-size:11px;font-weight:700">● Open</span>
+        </div>
+      </div>
+      <div class="card">
+        <div style="font-weight:700;font-size:14px;color:var(--navy)">Community Recreation Center</div>
+        <div style="font-size:12px;color:var(--text-mid);margin-top:4px">450 Oak Ave</div>
+        <div class="divider"></div>
+        <div class="shelter-row">
+          <span>📍 4.7 mi away</span>
+          <span style="display:inline-block;padding:3px 10px;border-radius:20px;background:#E8F8F0;color:#27AE60;font-size:11px;font-weight:700">● Open</span>
+        </div>
+      </div>
+      <div class="card">
+        <div style="font-weight:700;font-size:14px;color:var(--navy)">Lincoln High School Gym</div>
+        <div style="font-size:12px;color:var(--text-mid);margin-top:4px">800 Lincoln Blvd</div>
+        <div class="divider"></div>
+        <div class="shelter-row">
+          <span>📍 6.1 mi away</span>
+          <span style="display:inline-block;padding:3px 10px;border-radius:20px;background:#FEF0EF;color:#C0392B;font-size:11px;font-weight:700">● Closed</span>
+        </div>
+      </div>
+    </div>
+
+    <!-- PLAN -->
+    <div id="screen-plan" class="hidden">
+      <button class="btn-back" onclick="showScreen('home')">← Back</button>
+      <div class="page-title">Your Plan</div>
+      <div class="page-sub">Personalized for your household</div>
+      <div class="card">
+        <div id="plan-pills"></div>
+        <div class="divider"></div>
+        <div style="font-weight:700;font-size:12px;color:var(--navy);letter-spacing:0.5px;margin-bottom:10px">ACTION CHECKLIST</div>
+        <div id="plan-list"></div>
+      </div>
+    </div>
+
+    <!-- TRAINING -->
+    <div id="screen-training" class="hidden">
+      <button class="btn-back" onclick="resetQuiz()">← Back</button>
+      <div class="page-title">Training Quiz</div>
+      <div class="page-sub">Test your emergency readiness</div>
+      <div id="quiz-area"></div>
+    </div>
+
+  </div><!-- end content -->
+
+  <!-- NAVBAR -->
+  <div class="navbar hidden" id="navbar">
+    <button class="nav-btn active" id="nav-home" onclick="navTo('home')">
+      <span class="nav-icon">🏠</span>Home
+    </button>
+    <button class="nav-btn" id="nav-alerts" onclick="navTo('alerts')">
+      <span class="nav-icon">🚨</span>Alerts
+    </button>
+    <button class="nav-btn" id="nav-training" onclick="navTo('training')">
+      <span class="nav-icon">🎓</span>Training
+    </button>
+  </div>
+</div>
+
+<script>
+  let userData = { zip: '', people: '', pets: '', access: '' };
+  let supplyChecks = {};
+  let quizStep = 0, quizScore = 0;
+
+  const QUIZ = [
+    {
+      q: "A flood is approaching. What should you grab first?",
+      options: ["Water & important documents", "TV remote", "Extra clothes", "Pet toys"],
+      correct: 0,
+      explanation: "Water and important documents are survival priorities during a flood evacuation."
+    },
+    {
+      q: "You smell gas in your home. What do you do?",
+      options: ["Open windows only", "Leave immediately — don't touch any switches", "Call 911 from inside", "Turn on fans to air it out"],
+      correct: 1,
+      explanation: "Any spark can ignite gas. Leave immediately without touching electrical switches, then call 911 outside."
+    },
+    {
+      q: "During a tornado, the safest place is:",
+      options: ["Near windows to watch the storm", "Top floor interior room", "Basement or lowest interior room", "In your car away from trees"],
+      correct: 2,
+      explanation: "Get as low as possible in an interior room away from all windows."
+    }
+  ];
+
+  function startApp() {
+    userData.zip = document.getElementById('zip').value;
+    userData.people = document.getElementById('people').value;
+    userData.pets = document.getElementById('pets').value.toLowerCase();
+    userData.access = document.getElementById('access').value;
+    if (!userData.zip) return;
+    document.getElementById('zip-display').textContent = userData.zip;
+    document.getElementById('stat-people').textContent = userData.people || '—';
+    document.getElementById('stat-pets').textContent = userData.pets === 'yes' ? '🐾' : '—';
+    document.getElementById('stat-zip').textContent = userData.zip;
+    document.getElementById('shelter-sub').textContent = 'Based on ZIP: ' + userData.zip;
+    buildSupplies();
+    buildPlan();
+    document.getElementById('navbar').classList.remove('hidden');
+    showScreen('home');
+  }
+
+  function buildSupplies() {
+    const items = [
+      "Water (1 gallon/person/day × 3 days)",
+      "Non-perishable food (3-day supply)",
+      "Flashlight & extra batteries",
+      "First aid kit",
+      "Portable phone charger",
+      "Important documents (copies)",
+      "Cash in small bills",
+      "Whistle to signal for help"
+    ];
+    if (userData.pets === 'yes') items.push("Pet food, water & carrier");
+    if (userData.access && userData.access !== 'none') items.push("Medications & medical supplies");
+    const list = document.getElementById('supplies-list');
+    list.innerHTML = '';
+    items.forEach((item, i) => {
+      const div = document.createElement('div');
+      div.className = 'check-item';
+      div.id = 'supply-' + i;
+      div.innerHTML = `<span style="font-size:18px">${supplyChecks[i] ? '✅' : '⬜'}</span><span>${item}</span>`;
+      div.onclick = () => toggleSupply(i, items.length);
+      list.appendChild(div);
+    });
+    updateSupplyCount(items.length);
+  }
+
+  function toggleSupply(i, total) {
+    supplyChecks[i] = !supplyChecks[i];
+    const el = document.getElementById('supply-' + i);
+    el.querySelector('span').textContent = supplyChecks[i] ? '✅' : '⬜';
+    if (supplyChecks[i]) el.classList.add('done'); else el.classList.remove('done');
+    updateSupplyCount(total);
+  }
+
+  function updateSupplyCount(total) {
+    const checked = Object.values(supplyChecks).filter(Boolean).length;
+    document.getElementById('supply-count').textContent = checked + ' / ' + total;
+  }
+
+  function buildPlan() {
+    const pills = [];
+    if (userData.people) pills.push(`👥 ${userData.people}`);
+    if (userData.pets === 'yes') pills.push('🐾 Pets');
+    if (userData.access && userData.access !== 'none') pills.push(`♿ ${userData.access}`);
+    document.getElementById('plan-pills').innerHTML = pills.map(p =>
+      `<span class="pill" style="background:#E8F0FD;color:var(--navy);border:1px solid #C5D8F5">${p}</span>`
+    ).join('');
+
+    const checklist = [
+      "Pack emergency supply kit",
+      "Identify two evacuation routes",
+      "Save emergency contacts offline",
+      "Locate nearest shelter",
+      "Charge backup power banks"
+    ];
+    if (userData.pets === 'yes') checklist.push("Arrange pet carrier & food supply");
+    if (userData.access && userData.access !== 'none') checklist.push("Pack medications & medical equipment");
+    document.getElementById('plan-list').innerHTML = checklist.map(item =>
+      `<div class="check-item"><span style="color:var(--sky);font-size:16px">○</span><span style="font-size:13px">${item}</span></div>`
+    ).join('');
+  }
+
+  function showScreen(name) {
+    const screens = ['onboard','home','alerts','supplies','shelter','plan','training'];
+    screens.forEach(s => document.getElementById('screen-' + s).classList.add('hidden'));
+    document.getElementById('screen-' + name).classList.remove('hidden');
+    document.getElementById('content').scrollTop = 0;
+    if (name === 'training') renderQuiz();
+  }
+
+  function navTo(name) {
+    document.querySelectorAll('.nav-btn').forEach(b => b.classList.remove('active'));
+    document.getElementById('nav-' + name).classList.add('active');
+    showScreen(name);
+  }
+
+  function renderQuiz() {
+    const area = document.getElementById('quiz-area');
+    if (quizStep >= QUIZ.length) {
+      const pct = quizScore / QUIZ.length;
+      area.innerHTML = `
+        <div class="card" style="text-align:center;padding:28px">
+          <div style="font-size:52px;margin-bottom:12px">${pct === 1 ? '🏆' : pct >= 0.66 ? '👍' : '📚'}</div>
+          <div style="font-family:'Lora',serif;font-size:28px;font-weight:700;color:var(--navy)">${quizScore}/${QUIZ.length}</div>
+          <div style="color:var(--text-mid);margin-top:8px;font-size:14px">${pct === 1 ? 'Perfect! You are fully prepared.' : 'Good effort — review and try again.'}</div>
+          <button class="btn-primary" onclick="resetQuiz(false)" style="margin-top:20px">Retake Quiz</button>
+        </div>`;
+      return;
+    }
+    const q = QUIZ[quizStep];
+    area.innerHTML = `
+      <div class="card" style="background:var(--navy);margin-bottom:16px">
+        <div style="color:var(--gold);font-size:11px;letter-spacing:1px;margin-bottom:8px">QUESTION ${quizStep + 1} OF ${QUIZ.length}</div>
+        <div style="color:white;font-size:15px;line-height:1.6;font-weight:600">${q.q}</div>
+      </div>
+      ${q.options.map((opt, i) => `<button class="quiz-option" id="qopt-${i}" onclick="answerQuiz(${i})">${opt}</button>`).join('')}
+    `;
+  }
+
+  function answerQuiz(idx) {
+    const q = QUIZ[quizStep];
+    document.querySelectorAll('.quiz-option').forEach((btn, i) => {
+      btn.onclick = null;
+      if (i === q.correct) btn.classList.add('correct');
+      else if (i === idx && idx !== q.correct) btn.classList.add('wrong');
+    });
+    if (idx === q.correct) quizScore++;
+    const area = document.getElementById('quiz-area');
+    const feedback = document.createElement('div');
+    const correct = idx === q.correct;
+    feedback.className = 'feedback-card';
+    feedback.style.borderColor = correct ? '#27AE60' : '#C0392B';
+    feedback.style.background = correct ? '#E8F8F0' : '#FEF0EF';
+    feedback.innerHTML = `
+      <div style="font-size:28px">${correct ? '✅' : '❌'}</div>
+      <div style="font-weight:700;color:${correct ? '#27AE60' : '#C0392B'};margin-top:8px">${correct ? 'Correct!' : 'Not quite.'}</div>
+      <div style="font-size:13px;color:var(--text-mid);margin-top:8px;line-height:1.5">${q.explanation}</div>
+    `;
+    area.appendChild(feedback);
+    setTimeout(() => { quizStep++; renderQuiz(); }, 2000);
+  }
+
+  function resetQuiz(goHome = true) {
+    quizStep = 0;
+    quizScore = 0;
+    if (goHome) showScreen('home');
+    else renderQuiz();
+  }
+</script>
+</body>
+</html>
